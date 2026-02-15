@@ -6,6 +6,19 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 
 ---
 
+## **Project-Specific Configuration**
+
+This file contains **universal agent rules** that work for any software project. For project-specific settings, read `.clinerules/project.md` which defines:
+
+- Build, test, and verify commands
+- Package manager and toolchain
+- Project structure and conventions
+- Shell command patterns
+
+**If `.clinerules/project.md` does not exist**, detect project settings from manifest files (`package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml`, `Makefile`, `docker-compose.yml`, etc.) and use sensible defaults.
+
+---
+
 ## **🚨 ULTRA-CRITICAL: MANDATORY COMPLIANCE WITH CODING STANDARDS 🚨**
 
 **Before ANY planning or implementation, you MUST consult `code.md` and `testing.md`.**
@@ -15,24 +28,62 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 1. 🛑 **STOP** — Do not proceed without compliance check
 2. 📖 **READ CODE.MD** — Review relevant coding standards
 3. 📖 **READ TESTING.MD** — Review test commands and workflow
-4. ✅ **VERIFY COMPLIANCE** — Ensure approach follows both documents
+4. 📖 **READ PROJECT DOCS** — Review any project-specific documentation or specs
+5. ✅ **VERIFY COMPLIANCE** — Ensure approach follows all applicable documents
 
 ### What MUST Be Checked
 
 **📋 In code.md:**
-- Testing requirements (Rules 4-8): All tests must pass, maximum coverage
-- Code quality (Rules 1-3): DRY, clarity, single responsibility
-- Documentation (Rules 9-11): Comments, JSDoc, junior-dev readability
-- Monorepo rules (Rules 17-19): Package boundaries, dependency classification
-- Architecture (Rules 20-23): Inheritance chains for large implementations
-- OOP rules (Rules 12-13): No private members, use protected instead
-- TypeScript (Rules 24-27): No `as any`, proper type guards
+- Testing requirements: All tests must pass, maximum coverage
+- Code quality: DRY, clarity, single responsibility
+- Documentation: Comments, doc comments, junior-dev readability
+- Architecture: File splitting strategies for large implementations
+- Language-specific rules: Follow conventions defined in code.md and project.md
 
 **📋 In testing.md:**
-- Test commands for specific packages and full suite
-- Vitest configuration and conventions
-- Docker requirements for integration tests
-- TDD workflow for AI agents
+- Test commands for the project (from `.clinerules/project.md`)
+- Test framework configuration and conventions
+- Test environment requirements (e.g., Docker for integration tests)
+- Test workflow for AI agents
+
+### Compliance in Plan Mode
+
+**When creating ANY plan:**
+
+1. ✅ **Reference code.md rules** — Cite specific rules in your plan
+2. ✅ **Reference project documentation** — Cite relevant docs/conventions
+3. ✅ **Explain testing strategy** — Based on code.md testing requirements
+4. ✅ **Explain architecture strategy** — Based on code.md architecture rules if >500 lines
+
+### Compliance in Act Mode
+
+**When implementing ANY code:**
+
+1. ✅ All tests must pass before completion
+2. ✅ Create maximum test coverage
+3. ✅ Add mandatory comments explaining WHY
+4. ✅ Add doc comments to all public/protected members
+5. ✅ Split tests into logically grouped files
+
+### Violation Detection
+
+**Signs you're violating this rule:**
+
+- ❌ Writing code without doc comments
+- ❌ Writing code without tests
+- ❌ Skipping comments for complex logic
+- ❌ Putting all tests in one large file
+- ❌ Implementing features without checking documentation
+
+### Emergency Stop Protocol
+
+**If you realize you've violated this rule:**
+
+1. 🛑 **IMMEDIATE STOP** — Halt current work
+2. 📖 **READ DOCUMENTS** — Review missed sections
+3. 🔄 **REVISE APPROACH** — Fix non-compliant work
+4. ✅ **VERIFY COMPLIANCE** — Check against documents
+5. ⚡ **PROCEED ONLY AFTER FIX** — Don't continue with violations
 
 ---
 
@@ -51,14 +102,14 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 ### File Creation Rules
 
 - ✅ Split files into smaller, logically grouped files to prevent context limits
-- ✅ If creating a large class (>500 lines), use multi-chain inheritance technique
+- ✅ If creating a large class (>500 lines), use appropriate splitting strategy (see code.md)
 - ✅ No single file should require >30K tokens to write
 - ✅ Break large write operations into multiple smaller writes
 
 ### Context Threshold Protocol
 
 | Context Usage | Action |
-|--------------|--------|
+|---------------|--------|
 | 0-70% | Continue implementing tasks normally |
 | 70-80% | Continue, assess if current task can be completed |
 | 80-90% | Complete current task, then wrap up |
@@ -84,7 +135,7 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 2. **Break into logical phases** — What are the major steps?
 3. **Further subdivide each phase** — Can this step be smaller?
 4. **Consider architecture** — Will implementation exceed 500 lines?
-5. **Plan inheritance chain** — If large, design layer hierarchy
+5. **Plan splitting strategy** — If large, design layer/module hierarchy
 6. **Verify granularity** — Can this be completed in one focused session?
 
 ### Objective Task Size Criteria — A Task is "LARGE" When It Meets ANY:
@@ -93,7 +144,7 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 - **Lines:** Adds/modifies 200+ lines of code
 - **Concerns:** Involves 3 or more logical concerns/features
 - **Complexity:** Contains complex algorithms or intricate logic
-- **Integration:** Requires integration across multiple packages/modules
+- **Integration:** Requires integration across multiple packages/modules/services
 - **Uncertainty:** Any significant uncertainty about scope or approach
 
 ### Act Mode Step Size Guidelines
@@ -122,7 +173,7 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 
 | Task Type | Max Per Session | Session Deliverable |
 |-----------|-----------------|---------------------|
-| Unit Tests | 15-30 tests | One describe() block |
+| Unit Tests | 15-30 tests | One describe() block or test group |
 | Implementation | 100-200 lines | One method/function/component |
 | Refactoring | 2-3 files | One concern |
 | Documentation | 1-2 sections | One topic |
@@ -131,11 +182,45 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 ### Multi-Session Workflow
 
 **Each session:**
+
 1. Review task_progress from previous session
 2. Execute ONLY the current session's deliverable
-3. Run tests: `clear && yarn build && yarn test`
+3. Run project's verify command (from `.clinerules/project.md`)
 4. Call `attempt_completion` with session results
 5. List remaining work for future sessions
+
+### Multi-Session Progress Tracking
+
+**At the START of each session, include:**
+
+```markdown
+## Multi-Session Progress
+
+**Overall Task:** [Task name]
+**Total Sessions Planned:** [N]
+**Current Session:** [X of N]
+**Previous Sessions Completed:**
+- Session 1: ✅ [Deliverable 1]
+- Session 2: ✅ [Deliverable 2]
+- Session 3: ⏳ [Current deliverable]
+
+**This Session's Goal:** [Specific deliverable]
+```
+
+**At the END of each session, include:**
+
+```markdown
+## Session Complete
+
+**Completed:** [What was done]
+**Tests Added:** [Count]
+**Tests Passing:** [Status]
+**Remaining Sessions:**
+- Session N+1: [Deliverable]
+- Session N+2: [Deliverable]
+
+**User Action:** Start new task for next session
+```
 
 ---
 
@@ -147,16 +232,15 @@ These rules are **mandatory** and must be applied **strictly and consistently** 
 
 1. **✅ Always prefix shell commands with `clear &&`**
    - Every `execute_command` must start with `clear &&`
+   - This ensures a clean terminal for each command
 
-2. **✅ Use YARN exclusively — NEVER use NPM or NPX**
-   - ❌ Never: `npm install`, `npm run`, `npx`
-   - ✅ Always: `yarn install`, `yarn`, `yarn workspace`
+2. **✅ Use the project's designated package manager exclusively**
+   - Check `.clinerules/project.md` for the correct package manager
+   - Never mix package managers (e.g., don't use `npm` in a `yarn` project)
 
-3. **✅ Standard test commands**
-   - Targeted (monorepo): `clear && yarn workspace @myorg/<pkg> test`
-   - Targeted (single repo): `clear && yarn test`
-   - All tests: `clear && yarn build && yarn test`
-   - Clean run: `clear && yarn clean && yarn build && yarn test`
+3. **✅ Use the project's standard commands**
+   - Build, test, verify, and clean commands are defined in `.clinerules/project.md`
+   - If no `project.md` exists, detect from manifest files and use sensible defaults
 
 ---
 
@@ -187,7 +271,7 @@ Before starting any new task:
 
 1. ✅ Review the codebase against previous task requirements
 2. ✅ Confirm all deliverables were implemented
-3. ✅ Check that tests pass
+3. ✅ Check that tests/validation pass
 4. ✅ Verify no partial implementations or TODOs left behind
 
 ---
@@ -209,9 +293,9 @@ Before calling `attempt_completion`, perform a **comprehensive final check**:
 
 1. **✅ Requirements Met** — Re-read the original request, verify everything
 2. **✅ Code Quality** — Follows code.md standards, no debugging code left
-3. **✅ Testing** — All tests pass (`clear && yarn build && yarn test`)
+3. **✅ Testing** — All tests pass (project's verify command from `.clinerules/project.md`)
 4. **✅ Edge Cases** — Boundary conditions, error scenarios handled
-5. **✅ Documentation** — Comments, JSDoc, README updates
+5. **✅ Documentation** — Comments, doc comments, README updates
 6. **✅ Completeness** — No TODO comments for current task, no partial implementations
 
 **If ANY item fails → Do NOT call attempt_completion. Fix first.**
@@ -238,42 +322,47 @@ Before calling `attempt_completion`, perform a **comprehensive final check**:
 
 ---
 
-### **Rule 8: NO Inline Node.js Debug Scripts — ALWAYS Create Script Files**
+### **Rule 8: NO Inline Debug Scripts — ALWAYS Create Script Files**
 
-**🚨 NEVER use inline `node -e` commands for debugging. ALWAYS create script files.**
+**🚨 NEVER use inline command-line debug scripts. ALWAYS create script files.**
 
 #### PROHIBITED (NEVER DO):
 
 ```bash
 ❌ node -e "import { ... } from './dist/...'; ..."
 ❌ node --input-type=module -e "..."
+❌ python -c "from module import ..."
 ❌ echo "..." | node
 ```
 
 #### REQUIRED (ALWAYS DO):
 
-1. Create a TypeScript script file in `scripts/`:
-   ```typescript
-   // scripts/debug-[feature]-[issue].ts
-   import { myFunction } from '../src/utils/my-function.js';
-
-   const result = myFunction({ name: 'test' });
-
-   console.log('Result:', result);
+1. Create a script file in `scripts/`:
+   ```
+   scripts/debug-[feature]-[issue].[ext]
    ```
 
-2. Run with: `clear && yarn tsx scripts/debug-[feature]-[issue].ts`
+2. Write proper code with imports:
+   ```
+   // scripts/debug-auth-token-refresh.[ext]
+   // Import from project sources
+   // Run the debugging logic
+   // Print results
+   ```
+
+3. Run the script using the project's runner (from `.clinerules/project.md`)
 
 #### Script Naming Convention:
 
 ```
-scripts/debug-[module]-[specific-issue].ts
+scripts/debug-[module]-[specific-issue].[ext]
 ```
 
 Examples:
 - `scripts/debug-auth-token-refresh.ts`
-- `scripts/debug-api-response-parsing.ts`
-- `scripts/debug-form-validation-edge-case.ts`
+- `scripts/debug-api-response-parsing.py`
+- `scripts/debug-query-builder-join.ts`
+- `scripts/debug-nginx-upstream.sh`
 
 ---
 
@@ -295,12 +384,44 @@ Examples:
 
 ---
 
+### **Rule 10: VS Code Settings Automation (Optional)**
+
+If the project uses `scripts/agent.sh` for VS Code settings automation:
+
+**Act Mode Requirements:**
+
+1. **✅ Execute `clear && scripts/agent.sh start` as THE FIRST COMMAND of any Act Mode task**
+   - Switches VS Code to development mode
+
+2. **✅ Execute `clear && scripts/agent.sh finished` as THE LAST COMMAND of any Act Mode task**
+   - Switches VS Code to completion mode (full linting, formatting, cleanup)
+
+**Workflow Pattern:**
+
+```bash
+# FIRST COMMAND - Start of any Act Mode task
+clear && scripts/agent.sh start
+
+# ... perform all task implementation work ...
+
+# LAST COMMAND - End of any Act Mode task
+clear && scripts/agent.sh finished
+```
+
+**When NOT to Apply:**
+
+- ❌ Do not use in Plan Mode
+- ❌ Do not use if `scripts/agent.sh` does not exist in the project
+- ❌ Do not use if already in the middle of a task (only at start/end boundaries)
+
+---
+
 ## **Summary: Applying These Rules**
 
 **Every Single Time You Respond:**
 
-0. 📖 **MANDATORY FIRST:** Consult code.md + testing.md (BOTH Plan AND Act Mode)
-1. 🔧 Follow shell command rules (Rule 1 — `clear &&` and yarn only)
+0. 📖 **MANDATORY FIRST:** Consult code.md + testing.md + project docs (BOTH Plan AND Act Mode)
+1. 🔧 Follow shell command rules (Rule 1 — `clear &&` and project's package manager)
 2. 🧠 Perform internal self-check (Rule 2)
 3. 💡 Enhance requirements if unclear (Rule 3 — Plan Mode)
 4. ✅ Verify previous work is complete (Rule 4 — before new tasks)
@@ -309,7 +430,8 @@ Examples:
 7. 🚫 **NEVER overcomplicate** — Use existing infrastructure (Rule 7)
 8. 📦 **NO inline debug scripts** — ALWAYS create script files (Rule 8)
 9. 🗜️ **After task completion:** Suggest `/compact` (Rule 9)
-10. 📊 **Context management:** Continue until 90%, then wrap + commit + `/compact`
+10. ⚙️ **Act Mode ONLY:** Execute agent.sh if available (Rule 10 — start/finish settings)
+11. 📊 **Context management:** Continue until 90%, then wrap + commit + `/compact`
 
 ---
 
@@ -320,3 +442,4 @@ Examples:
 - See **plans.md** for detailed guidance on creating implementation plans
 - See **make_plan.md** for plan creation/execution triggers and session rules
 - See **git-commands.md** for git workflow instructions (`gitcm`, `gitcmp`)
+- See **`.clinerules/project.md`** for project-specific commands, toolchain, and conventions
